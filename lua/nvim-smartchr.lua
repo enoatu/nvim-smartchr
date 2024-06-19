@@ -5,13 +5,32 @@ M.key_mappings = {}
 
 -- カーソル位置の前に特定の文字列があるかをチェックする関数
 local function cursor_preceded_with(pattern)
-    -- 挿入モードや他のモードの場合
     return vim.fn.search("\\V" .. vim.fn.escape(pattern, "\\") .. "\\%#", "bcn") ~= 0
+end
+
+-- 現在のファイルタイプに対応するキーのマッピングを取得する関数
+local function get_mappings_for_filetype(filetype)
+    local maps = M.key_mappings.default or {}
+    for pattern, mappings in pairs(M.key_mappings) do
+        -- 条件に合った際にマージ
+        pattern = vim.fn.escape(pattern, "|")
+        if vim.fn.match(filetype, pattern) ~= -1 then
+            for key, value in pairs(mappings) do
+                maps[key] = value
+            end
+        end
+    end
+    return maps
 end
 
 -- 文字列の展開と置換を行う関数
 function M.expand(key)
-    local mapping = M.key_mappings[key]
+    -- 現在のファイルタイプに対応するキーのマッピングを取得
+    local filetype = vim.bo.filetype
+    local mappings = get_mappings_for_filetype(filetype)
+
+    local mapping = mappings[key]
+
     if not mapping then
         return key
     end
@@ -42,9 +61,10 @@ function M.expand(key)
 end
 
 -- キーマッピングを登録する関数
-function M.map(key, replacements, opts)
+function M.map(filetype_pattern, key, replacements, opts)
     opts = opts or {}
-    M.key_mappings[key] = {
+    M.key_mappings[filetype_pattern] = M.key_mappings[filetype_pattern] or {}
+    M.key_mappings[filetype_pattern][key] = {
         literals = replacements,
         loop = opts.loop or false,
     }
@@ -59,9 +79,15 @@ function M.map(key, replacements, opts)
 end
 
 -- プラグインの初期設定を行う関数
-function M.setup(mappings)
-    for key, mapping in pairs(mappings) do
-        M.map(key, mapping.literals, { loop = mapping.loop })
+function M.setup(config)
+    local mappings = config.mappings or {}
+    for filetype_pattern, key_mappings in pairs(mappings) do
+        for _, mapping in ipairs(key_mappings) do
+            local key = mapping[1]
+            local replacements = mapping[2]
+            local opts = mapping[3] or {}
+            M.map(filetype_pattern, key, replacements, opts)
+        end
     end
 end
 
