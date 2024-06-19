@@ -93,20 +93,7 @@ When defining a key mapping, you can specify the `loop` option as `true` or `fal
 
 ### Examples
 
-#### Example 1: `loop = false`
-
-```lua
-{ "=", { " = ", " == ", "=" }, { loop = false } }
-```
-
-- **First press**: `=` transforms to " = ".
-- **Second press**: " = " transforms to " == ".
-- **Third press**: " == " transforms back to "=".
-- **Fourth press and beyond**: It stays as "=".
-
-In this setup, the sequence stops at the last replacement, making the key stable and ready for the next input. It’s advisable to have the key itself as the last replacement value to ensure it returns to its original state.
-
-#### Example 2: `loop = true`
+#### Example 1: `loop = true`
 
 ```lua
 { "=", { " = ", " == ", "=" }, { loop = true } }
@@ -121,6 +108,20 @@ In this setup, the sequence stops at the last replacement, making the key stable
 With `loop = true`, the replacements keep cycling, allowing continuous toggling between different states. This is useful when you need to switch back and forth among various forms of the replacement.
 
 By configuring the `loop` option according to your needs, you can tailor the behavior of your key mappings in `nvim-smartchr` to match your workflow preferences.
+
+#### Example 2: `loop = false`
+
+```lua
+{ "=", { " = ", " == ", "=" }, { loop = false } }
+```
+
+- **First press**: `=` transforms to " = ".
+- **Second press**: " = " transforms to " == ".
+- **Third press**: " == " transforms back to "=".
+- **Fourth press and beyond**: It stays as "=".
+
+In this setup, the sequence stops at the last replacement, making the key stable and ready for the next input. It’s advisable to have the key itself as the last replacement value to ensure it returns to its original state.
+
 
 ## Contributions
 
