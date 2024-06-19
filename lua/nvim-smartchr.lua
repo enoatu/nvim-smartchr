@@ -10,7 +10,7 @@ end
 
 -- 現在のファイルタイプに対応するキーのマッピングを取得する関数
 local function get_mappings_for_filetype(filetype)
-    local maps = M.key_mappings.default or {}
+    local maps = vim.deepcopy(M.key_mappings.default) or {}
     for pattern, mappings in pairs(M.key_mappings) do
         -- 条件に合った際にマージ
         pattern = vim.fn.escape(pattern, "|")
